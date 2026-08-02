@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 import emailRegex from "../utils/email_regex.js";
+import jwt from "jsonwebtoken";
 
 const UserSchema = new mongoose.Schema({
     firstName: {
@@ -39,6 +41,14 @@ const UserSchema = new mongoose.Schema({
         timestamps:true
     }
 );
+
+UserSchema.pre('save', async function () {
+    if(!this.isModified('password')) return;
+    
+    const salt = await bcrypt.genSalt(12);
+    this.password = await bcrypt.hash(this.password,salt);
+});
+
 
 
 export default mongoose.model('User',UserSchema);
