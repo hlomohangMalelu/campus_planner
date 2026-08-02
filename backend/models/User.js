@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import emailRegex from "../utils/email_regex.js";
 
 const UserSchema = new mongoose.Schema({
     firstName: {
@@ -22,7 +23,7 @@ const UserSchema = new mongoose.Schema({
         unique:true,
         lowercase:true,
         match:[
-            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+            emailRegex,
             'Please provide a valid email'
         ]
     },

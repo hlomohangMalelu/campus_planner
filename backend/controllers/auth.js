@@ -4,7 +4,5 @@ import bcrypt from "bcryptjs";
 
 export const register = (req, res) => {
 
-
-
-    res.send('Regiser user');
+    res.json(req.validatedData);
 }
