@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import emailRegex from "../utils/email_regex.js";
 import jwt from "jsonwebtoken";
+import _default from "zod/v4/locales/az.cjs";
 
 const UserSchema = new mongoose.Schema({
     firstName: {
@@ -35,6 +36,15 @@ const UserSchema = new mongoose.Schema({
         required:[true, 'Please provide a password'],
         minlength:8,
         select:false
+    },
+    role:{
+        type:String,
+        required:[true,'Please provide a role'],
+        default:'student',
+        enum: {
+            values:['student','admin'],
+            message:'Please provide a valid role'
+        }
     }
 
     },
@@ -58,7 +68,7 @@ UserSchema.methods.comparePassword = async function(candidatePassword) {
 
 UserSchema.methods.createJWT = function () {
     return jwt.sign(
-        {userId:this._id},
+        {userId:this._id,role:this.role},
         process.env.JWT_SECRET,
         {expiresIn:process.env.JWT_LIFETIME}
     );

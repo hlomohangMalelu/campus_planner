@@ -13,12 +13,11 @@ const authorizeUser = async (req,res,next) => {
     
     try {
         const payload = jwt.verify(token,process.env.JWT_SECRET);
-        const {userId} = payload;
+        const {userId,role} = payload;
         req.user = {
-            userId
-            //role,
+            userId,
+            role
             //universityId
-
         };
 
         return next();
