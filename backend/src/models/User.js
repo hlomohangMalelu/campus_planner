@@ -51,7 +51,7 @@ UserSchema.pre('save', async function () {
 });
 
 UserSchema.methods.comparePassword = async function(candidatePassword) {
-    return await bcrypt.compare(canditatePassword , this.password);
+    return await bcrypt.compare(candidatePassword , this.password);
 
 }
 
@@ -62,6 +62,15 @@ UserSchema.methods.createJWT = function () {
         process.env.JWT_SECRET,
         {expiresIn:process.env.JWT_LIFETIME}
     );
+}
+
+UserSchema.methods.toPublicProfile = function () {
+    return {
+        userId:this._id,
+        firstName: this.firstName,
+        lastName: this.lastName,
+        email: this.email
+    }
 }
 
 

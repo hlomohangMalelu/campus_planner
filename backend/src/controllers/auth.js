@@ -1,6 +1,7 @@
 import "dotenv/config";
 import User from "../models/User.js";
 import BadRequestError from "../errors/bad_request.js";
+import UnauthorizedError from "../errors/unauthorized.js";
 import { StatusCodes } from "http-status-codes";
 
 export const register = async (req, res) => {
@@ -19,5 +20,26 @@ export const register = async (req, res) => {
 
 
 export const login = async (req , res) => {
-    res.json(req.validatedData);
+
+    const {email , password} = req.validatedData;
+
+    const user = await User.findOne({email}).select('+password');
+
+    if(!user) {
+        throw new UnauthorizedError('Invalid email or password');
+    }
+
+    const isPasswordCorrect = await user.comparePassword(password);
+
+    if(!isPasswordCorrect) {
+        throw new UnauthorizedError('Invalid email or password');
+    }
+
+    const token = user.createJWT();
+
+    res.status(StatusCodes.OK).json({
+        success:true,
+        user:user.toPublicProfile(),
+        token
+    });
 }
