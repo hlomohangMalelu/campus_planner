@@ -1,7 +1,10 @@
 import "dotenv/config";
 import User from "../models/User.js";
-import BadRequestError from "../errors/bad_request.js";
-import UnauthorizedError from "../errors/unauthorized.js";
+import {
+    NotFoundError ,
+    BadRequestError , 
+    UnauthorizedError
+} from "../errors/errors.js"
 import { StatusCodes } from "http-status-codes";
 
 export const register = async (req, res) => {
@@ -46,5 +49,15 @@ export const login = async (req , res) => {
 
 
 export const getUser = async (req ,res) => {
-    return res.json(req.user);
+    const {userId} = req.user;
+
+    const user = await User.findById(userId);
+
+    if(!user) {
+        throw new UnauthorizedError("Authentication invalid");
+    }
+
+    return res.json({
+        user: user.toPublicProfile()
+    });
 }

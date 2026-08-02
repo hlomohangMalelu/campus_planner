@@ -21,7 +21,7 @@ const authorizeUser = async (req,res,next) => {
 
         };
 
-        next();
+        return next();
     } catch (error) {
         throw new UnauthorizedError('Not authorized to access this route');
     }

@@ -4,7 +4,7 @@ import connectDB from "./src/db/connect.js";
 import authRouter from "./src/routes/auth.js";
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 8000;
 
 //middleware
 app.use(express.json()); //json parser
