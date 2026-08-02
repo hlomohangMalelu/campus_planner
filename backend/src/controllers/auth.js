@@ -15,7 +15,7 @@ export const register = async (req, res) => {
 
     const user = await User.create(req.validatedData);
     
-    res.status(StatusCodes.CREATED).json({success:true,message:'Account created successfully'});
+    return res.status(StatusCodes.CREATED).json({success:true,message:'Account created successfully'});
 }
 
 
@@ -37,9 +37,14 @@ export const login = async (req , res) => {
 
     const token = user.createJWT();
 
-    res.status(StatusCodes.OK).json({
+    return res.status(StatusCodes.OK).json({
         success:true,
         user:user.toPublicProfile(),
         token
     });
+}
+
+
+export const getUser = async (req ,res) => {
+    return res.json(req.user);
 }
