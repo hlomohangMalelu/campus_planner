@@ -1,3 +1,4 @@
+import "dotenv/config";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import emailRegex from "../utils/email_regex.js";
@@ -49,6 +50,19 @@ UserSchema.pre('save', async function () {
     this.password = await bcrypt.hash(this.password,salt);
 });
 
+UserSchema.methods.comparePassword = async function(candidatePassword) {
+    return await bcrypt.compare(canditatePassword , this.password);
+
+}
+
+
+UserSchema.methods.createJWT = function () {
+    return jwt.sign(
+        {userId:this._id},
+        process.env.JWT_SECRET,
+        {expiresIn:process.env.JWT_LIFETIME}
+    );
+}
 
 
 export default mongoose.model('User',UserSchema);

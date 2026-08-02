@@ -16,3 +16,8 @@ export const register = async (req, res) => {
     
     res.status(StatusCodes.CREATED).json({success:true,message:'Account created successfully'});
 }
+
+
+export const login = async (req , res) => {
+    res.json(req.validatedData);
+}
