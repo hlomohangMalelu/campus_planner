@@ -1,49 +1,25 @@
-import "dotenv/config";
-import User from "../models/User.js";
-import {
-    NotFoundError ,
-    BadRequestError , 
-    UnauthorizedError
-} from "../errors/errors.js"
+import * as authService from "../services/auth.service.js";
 import { StatusCodes } from "http-status-codes";
+
 
 export const register = async (req, res) => {
 
-    const {email , password , firstName , lastName} = req.validatedData;
-    const existingUser = await User.findOne({email});
-
-    if(existingUser) {
-        throw new BadRequestError('An account with this email already exists.');
-    }
-
-    const user = await User.create(req.validatedData);
+   const result = await authService.register(req.validatedData);
     
-    return res.status(StatusCodes.CREATED).json({success:true,message:'Account created successfully'});
+    return res.status(StatusCodes.CREATED).json({
+        success: true,
+        ...result
+    });
 }
 
 
 export const login = async (req , res) => {
 
-    const {email , password} = req.validatedData;
-
-    const user = await User.findOne({email}).select('+password');
-
-    if(!user) {
-        throw new UnauthorizedError('Invalid email or password');
-    }
-
-    const isPasswordCorrect = await user.comparePassword(password);
-
-    if(!isPasswordCorrect) {
-        throw new UnauthorizedError('Invalid email or password');
-    }
-
-    const token = user.createJWT();
+    const result = await authService.login(req.validatedData);
 
     return res.status(StatusCodes.OK).json({
         success:true,
-        user:user.toPublicProfile(),
-        token
+        ...result
     });
 }
 
@@ -51,78 +27,34 @@ export const login = async (req , res) => {
 export const getCurrentUser = async (req ,res) => {
     const {userId} = req.user;
 
-    const user = await User.findById(userId);
-
-    if(!user) {
-        throw new UnauthorizedError('Authentication invalid');
-    }
+    const result = await authService.getUser(userId);
 
     return res.status(StatusCodes.OK).json({
         success:true,
-        user: user.toPublicProfile()
+        ...result
     });
 }
 
 export const updateUserProfile = async (req,res) => {
-    const { validatedData:{email}, user:{userId} } = req;
+    const {userId} = req.user;
 
-    if(email) {
-        const existingUser = await User.findOne({email});
-        if(existingUser) {
-            
-            if((existingUser._id).toString() !== userId) {
-                throw new BadRequestError('Email already taken');
-            }
-        }
-    }
-
-    const user = await User.findById(userId);
-    if (!user) {
-        throw new UnauthorizedError('Authentication invalid');
-    }
-    
-    Object.assign(user, req.validatedData);
-
-    await user.save();
+    const result = await authService.updateProfile(userId, req.validatedData);
 
     return res.status(StatusCodes.OK).json({
         success:true,
-        user:user.toPublicProfile()
+        ...result
     });
 }
 
 
 export const changePassword = async (req,res) => {
-    const {
-       user: {userId},
-       validatedData: {oldPassword , newPassword}
-    } = req;
+    const { userId } = req.user;
 
-    const user = await User.findById(userId).select('+password');
-
-     if (!user) {
-        throw new UnauthorizedError('Authentication invalid');
-    }
-
-    const isOldPasswordCorrect = await user.comparePassword(oldPassword);
-
-    if(!isOldPasswordCorrect) {
-        throw new UnauthorizedError('Current password is incorrect');
-    }
-
-    const isNewPasswordEqualOld = await user.comparePassword(newPassword);
-
-    if(isNewPasswordEqualOld) {
-        throw new BadRequestError('New password cannot be the same as the current password');
-    }
-
-    user.password = newPassword;
-
-    await user.save();
+    const result = await authService.changePassword(userId, req.validatedData);
 
     return res.status(StatusCodes.OK).json({
         success:true,
-        message: 'Password changed successfully'
+        ...result
     });
     
 }
