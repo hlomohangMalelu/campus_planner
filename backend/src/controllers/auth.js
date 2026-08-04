@@ -48,7 +48,7 @@ export const login = async (req , res) => {
 }
 
 
-export const getUser = async (req ,res) => {
+export const getCurrentUser = async (req ,res) => {
     const {userId} = req.user;
 
     const user = await User.findById(userId);
@@ -57,7 +57,12 @@ export const getUser = async (req ,res) => {
         throw new UnauthorizedError("Authentication invalid");
     }
 
-    return res.json({
+    return res.status(StatusCodes.OK).json({
         user: user.toPublicProfile()
     });
+}
+
+export const updateUserProfile = async (req,res) => {
+    console.log(req.validatedData);
+    res.status(StatusCodes.OK).json(req.validatedData);
 }

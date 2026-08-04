@@ -1,7 +1,7 @@
 import "dotenv/config";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-import emailRegex from "../utils/email_regex.js";
+import {emailRegex} from "../utils/email_regex.js";
 import jwt from "jsonwebtoken";
 import _default from "zod/v4/locales/az.cjs";
 
