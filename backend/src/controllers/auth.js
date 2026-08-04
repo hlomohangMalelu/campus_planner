@@ -54,10 +54,11 @@ export const getCurrentUser = async (req ,res) => {
     const user = await User.findById(userId);
 
     if(!user) {
-        throw new UnauthorizedError("Authentication invalid");
+        throw new UnauthorizedError('Authentication invalid');
     }
 
     return res.status(StatusCodes.OK).json({
+        success:true,
         user: user.toPublicProfile()
     });
 }
@@ -77,7 +78,7 @@ export const updateUserProfile = async (req,res) => {
 
     const user = await User.findById(userId);
     if (!user) {
-        throw new UnauthorizedError("Authentication invalid");
+        throw new UnauthorizedError('Authentication invalid');
     }
     
     Object.assign(user, req.validatedData);
@@ -85,11 +86,43 @@ export const updateUserProfile = async (req,res) => {
     await user.save();
 
     return res.status(StatusCodes.OK).json({
+        success:true,
         user:user.toPublicProfile()
     });
 }
 
 
 export const changePassword = async (req,res) => {
-    res.status(StatusCodes.OK).json(req.validatedData);
+    const {
+       user: {userId},
+       validatedData: {oldPassword , newPassword}
+    } = req;
+
+    const user = await User.findById(userId).select('+password');
+
+     if (!user) {
+        throw new UnauthorizedError('Authentication invalid');
+    }
+
+    const isOldPasswordCorrect = await user.comparePassword(oldPassword);
+
+    if(!isOldPasswordCorrect) {
+        throw new UnauthorizedError('Current password is incorrect');
+    }
+
+    const isNewPasswordEqualOld = await user.comparePassword(newPassword);
+
+    if(isNewPasswordEqualOld) {
+        throw new BadRequestError('New password cannot be the same as the current password');
+    }
+
+    user.password = newPassword;
+
+    await user.save();
+
+    res.status(StatusCodes.OK).json({
+        success:true,
+        message: 'Password changed successfully'
+    });
+    
 }
