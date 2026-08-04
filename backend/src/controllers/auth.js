@@ -120,9 +120,17 @@ export const changePassword = async (req,res) => {
 
     await user.save();
 
-    res.status(StatusCodes.OK).json({
+    return res.status(StatusCodes.OK).json({
         success:true,
         message: 'Password changed successfully'
     });
     
+}
+
+
+export const logout = async (req, res) => {
+    return res.status(StatusCodes.OK).json({
+        success: true,
+        message: 'Logged out successfully'
+    });
 }

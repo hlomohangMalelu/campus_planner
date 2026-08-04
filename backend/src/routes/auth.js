@@ -1,7 +1,8 @@
 import express from "express";
 import { 
     register ,login, getCurrentUser , 
-    updateUserProfile, changePassword
+    updateUserProfile, changePassword,
+    logout
 } from "../controllers/auth.js";
 import { 
     registrationValidator ,loginValidator ,
@@ -13,6 +14,7 @@ const router = express.Router();
 
 router.post('/register', registrationValidator, register);
 router.post('/login', loginValidator, login);
+router.post('/logout', authorizeUser, logout);
 router.get('/me', authorizeUser, getCurrentUser);
 router.patch('/profile', [authorizeUser, updateProfileValidator], updateUserProfile);
 router.patch('/change-password', [authorizeUser ,changePasswordValidator], changePassword);
