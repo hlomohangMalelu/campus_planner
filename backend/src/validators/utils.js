@@ -29,7 +29,7 @@ export const validateEmail = (email) => {
 }
 
 
-export const validateNewPassword = (password , confirmPassword) => {
+export const validatePassword = (password , confirmPassword) => {
     if(!password || !confirmPassword) return;
     if(password?.trim().length === 0) {
         throw new BadRequestError('Password cannot be empty or contain only spaces');

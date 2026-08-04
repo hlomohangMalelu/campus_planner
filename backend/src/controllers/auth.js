@@ -80,11 +80,16 @@ export const updateUserProfile = async (req,res) => {
         throw new UnauthorizedError("Authentication invalid");
     }
     
-    Object.assign(user,req.validatedData);
+    Object.assign(user, req.validatedData);
 
     await user.save();
 
     return res.status(StatusCodes.OK).json({
         user:user.toPublicProfile()
     });
+}
+
+
+export const changePassword = async (req,res) => {
+    res.status(StatusCodes.OK).json(req.validatedData);
 }

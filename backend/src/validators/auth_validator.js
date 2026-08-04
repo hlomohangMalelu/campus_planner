@@ -1,7 +1,7 @@
 import BadRequestError from "../errors/bad_request.js";
 import UnauthorizedError from "../errors/unauthorized.js"
 import {isEmailValid}from "../utils/email_regex.js";
-import { validateEmail, validateName ,validateNewPassword} from "./utils.js";
+import { validateEmail, validateName ,validatePassword} from "./utils.js";
 
 export const registrationValidator = (req,res,next) => {
     const {
@@ -17,7 +17,7 @@ export const registrationValidator = (req,res,next) => {
         throw new BadRequestError('Please fill all fields');
     }
 
-    const validatedNewPassword = validateNewPassword(password,confirmPassword);
+    const validatedNewPassword = validatePassword(password,confirmPassword);
     const validatedFirstName = validateName(firstName,'First name');
     const validatedLastName = validateName(lastName,'Last name');
     const validatedEmail = validateEmail(email);
@@ -34,7 +34,7 @@ export const registrationValidator = (req,res,next) => {
 }
 
 
-export const loginValidator = async (req, res, next) => {
+export const loginValidator =  (req, res, next) => {
     const {email,password} = req.body;
 
     if(!email || !password) {
@@ -54,7 +54,7 @@ export const loginValidator = async (req, res, next) => {
 }
 
 
-export const updateProfileValidator = async (req,res,next) => {
+export const updateProfileValidator = (req,res,next) => {
     const {
         firstName,
         lastName,
@@ -86,4 +86,27 @@ export const updateProfileValidator = async (req,res,next) => {
     req.validatedData = validatedData;
 
     next();
+}
+
+
+export const changePasswordValidator = (req,res,next) => {
+    const {
+        oldPassword,
+        newPassword,
+        confirmNewPassword,
+    } = req.body;
+
+    if(!oldPassword || !newPassword || !confirmNewPassword) {
+        throw new BadRequestError('Please fill all fields');
+    }
+
+    validatePassword(newPassword,confirmNewPassword);
+
+    req.validatedData = {
+        oldPassword,
+        newPassword
+    };
+
+    next();
+
 }
