@@ -63,6 +63,28 @@ export const getCurrentUser = async (req ,res) => {
 }
 
 export const updateUserProfile = async (req,res) => {
-    console.log(req.validatedData);
-    res.status(StatusCodes.OK).json(req.validatedData);
+    const { validatedData:{email}, user:{userId} } = req;
+
+    if(email) {
+        const existingUser = await User.findOne({email});
+        if(existingUser) {
+            
+            if((existingUser._id).toString() !== userId) {
+                throw new BadRequestError('Email already taken');
+            }
+        }
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+        throw new UnauthorizedError("Authentication invalid");
+    }
+    
+    Object.assign(user,req.validatedData);
+
+    await user.save();
+
+    return res.status(StatusCodes.OK).json({
+        user:user.toPublicProfile()
+    });
 }
