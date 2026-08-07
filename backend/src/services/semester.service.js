@@ -27,3 +27,22 @@ export const getAllSemesters = async (userId) => {
     return semesters;
 
 }
+
+
+const findOwnerSemester = async (userId, semesterId) => {
+    const semester = await Semester.findOne({
+        createdBy: userId, _id: semesterId
+    });
+
+    if(!semester) {
+        throw new CustomAPIError.NotFoundError(`No semester found with id: ${semesterId}`);
+    }
+
+    return semester;
+}
+
+
+export const getSemester = async (userId, semesterId) => {
+
+    return await findOwnerSemester(userId, semesterId);
+}

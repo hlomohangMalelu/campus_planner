@@ -1,4 +1,5 @@
 import BadRequestError from "../errors/bad_request.js";
+import mongoose from "mongoose";
 
 const validateSemesterDates = (startDateString , endDateString) => {
     
@@ -81,4 +82,13 @@ export const createSemesterValidator = (req, res , next) => {
 
     next();
 
+}
+
+
+export const mongooseIdValidator = (req , res, next) => {
+    if(!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        throw new BadRequestError('Invalid  ID');
+    }
+
+    next();
 }

@@ -28,3 +28,17 @@ export const getAllSemesters = async (req,res) => {
         nbHits: semesters.length
     });
 }
+
+export const getSemester = async (req, res) => {
+    const {
+        user : {userId},
+        params : {id : semesterId}
+    } = req;
+
+    const semester = await semesterService.getSemester(userId, semesterId);
+
+    return res.status(StatusCodes.OK).json({
+        success: true,
+        semester: semester.toPublicSemester()
+    });
+}

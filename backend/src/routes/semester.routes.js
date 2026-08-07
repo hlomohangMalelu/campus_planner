@@ -5,8 +5,8 @@ import * as semesterValidator from "../validators/semester.validators.js";
 const router = express.Router();
 
 
-router.post('/',semesterValidator.createSemesterValidator,semesterController.createSemester);
-router.get('/',semesterController.getAllSemesters);
-
+router.post('/', semesterValidator.createSemesterValidator,semesterController.createSemester);
+router.get('/', semesterController.getAllSemesters);
+router.get('/:id', semesterValidator.mongooseIdValidator , semesterController.getSemester);
 
 export default router;
