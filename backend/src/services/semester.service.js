@@ -14,3 +14,16 @@ export const createSemester = async (semesterData) => {
 
     return newSemester;
 }
+
+
+export const getAllSemesters = async (userId) => {
+
+    const semesters = await Semester.find({createdBy: userId}).sort('-academicYear startDate');
+
+    if(!semesters || semesters.length === 0) {
+        return [];
+    }
+
+    return semesters;
+
+}

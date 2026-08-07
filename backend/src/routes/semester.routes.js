@@ -6,6 +6,7 @@ const router = express.Router();
 
 
 router.post('/',semesterValidator.createSemesterValidator,semesterController.createSemester);
+router.get('/',semesterController.getAllSemesters);
 
 
 export default router;
