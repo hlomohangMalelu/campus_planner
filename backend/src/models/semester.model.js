@@ -22,7 +22,7 @@ const SemesterSchema = new mongoose.Schema(
             required:[true, 'Please provide end date']
         },
         status: {
-            type: string,
+            type: String,
             enum: {
                 values: ['upcoming', 'active', 'completed'],
                 message: 'Invalid semester status'
@@ -33,8 +33,7 @@ const SemesterSchema = new mongoose.Schema(
         createdBy: {
             type: mongoose.Types.ObjectId,
             ref: 'User',
-            required: [true, 'Please provide user'],
-            unique: true
+            required: [true, 'Please provide user']
         }
 
     },
@@ -42,6 +41,19 @@ const SemesterSchema = new mongoose.Schema(
         timestamps:true
     }
 );
+
+SemesterSchema.index({ name: 1, academicYear: 1, createdBy: 1 }, { unique: true });
+
+SemesterSchema.methods.toPublicSemester = function () {
+    return {
+        semesterId: this._id.toString(),
+        name: this.name,
+        academicYear: this.academicYear,
+        startDate: this.startDate,
+        endDate: this.endDate,
+        status: this.status,
+    };
+}
 
 
 
