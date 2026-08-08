@@ -8,5 +8,8 @@ const router = express.Router();
 router.post('/', semesterValidator.createSemesterValidator,semesterController.createSemester);
 router.get('/', semesterController.getAllSemesters);
 router.get('/:id', semesterValidator.mongooseIdValidator , semesterController.getSemester);
+router.patch('/:id' ,[semesterValidator.mongooseIdValidator,semesterValidator.updateSemesterValidator],semesterController.updateSemester);
+
+
 
 export default router;

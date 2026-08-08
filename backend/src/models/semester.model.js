@@ -56,5 +56,12 @@ SemesterSchema.methods.toPublicSemester = function () {
 }
 
 
+SemesterSchema.pre('save', function () {
+    if(!(this.endDate > this.startDate)) {
+        throw new BadRequestError('End date must be after start date');
+    }
+})
+
+
 
 export default mongoose.model('Semester', SemesterSchema);
