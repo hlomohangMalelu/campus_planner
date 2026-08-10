@@ -64,10 +64,25 @@ export const updateSemesterStatus = async (req, res) => {
         params : {id : semesterId}
     } = req;
 
-    const result = await semesterService.updateSemesterStatus(userId, semesterId, req.validatedData);
+    const semester = await semesterService.updateSemesterStatus(userId, semesterId, req.validatedData);
 
     return res.status(StatusCodes.OK).json({
         success: true,
-        ...result
+        semester: semester.toPublicSemester()
+    });
+}
+
+
+export const deleteSemester = async (req, res) => {
+    const {
+        user : {userId},
+        params : {id : semesterId}
+    } = req;
+
+    await semesterService.deleteSemester(userId, semesterId);
+
+    return res.status(StatusCodes.OK).json({
+       success: true,
+        message: 'Semester deleted successfully'
     });
 }

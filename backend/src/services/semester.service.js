@@ -103,8 +103,21 @@ export const updateSemesterStatus = async (userId, semesterId, statusUpdateData)
 
     await semesterToUpdate.save();
 
-    return {
-        message: 'Semester status updated successfully'
-    };
+    return semesterToUpdate;
 
+}
+
+
+export const deleteSemester = async (userId, semesterId) => {
+
+    const semester = await Semester.findOneAndDelete({
+        createdBy: userId,
+        _id: semesterId
+    });
+
+    if(!semester) {
+        throw new CustomAPIError.NotFoundError('Semester not found');
+    }
+
+    return semester;
 }
