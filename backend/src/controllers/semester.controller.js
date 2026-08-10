@@ -44,6 +44,16 @@ export const getSemester = async (req, res) => {
 }
 
 
-export const updateSemester = (req , res) => {
-    return res.status(StatusCodes.OK).json(req.validatedData);
+export const updateSemester = async (req , res) => {
+    const {
+        user : {userId},
+        params : {id : semesterId}
+    } = req;
+
+    const semester = await semesterService.updateSemester(userId, semesterId, req.validatedData);
+
+    return res.status(StatusCodes.OK).json({
+        success: true,
+        semester: semester.toPublicSemester()
+    });
 }

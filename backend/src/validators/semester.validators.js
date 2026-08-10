@@ -1,10 +1,12 @@
 import {BadRequestError} from "../errors/errors.js";
 import mongoose from "mongoose";
 
-const validateSemesterDates = (startDateString , endDateString) => {
+export const validateSemesterDates = (startDate , endDate) => {
     
-    const startDate = new Date(startDateString?.trim());
-    const endDate = new Date(endDateString?.trim());
+    if(!(startDate instanceof Date && endDate instanceof Date)) {
+        startDate = new Date(startDate?.trim());
+        endDate = new Date(endDate?.trim());
+    }
 
     if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
         throw new BadRequestError("Please provide valid dates");
