@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import {BadRequestError } from "../errors/errors.js"
 import {isEmailValid}from "../utils/email_regex.js";
 
@@ -45,4 +46,12 @@ export const validatePassword = (password , confirmPassword) => {
     }
 
     return password;
+}
+
+
+export const validateMongooseId = (id , idOwner) => {
+    if(!mongoose.Types.ObjectId.isValid(id)) {
+        throw new BadRequestError(`Invalid ${idOwner} ID`);
+    }
+
 }

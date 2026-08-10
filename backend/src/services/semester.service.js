@@ -80,3 +80,31 @@ export const updateSemester = async (userId, semesterId, updateData) => {
 
     return semesterToUpdate;
 }
+
+
+export const updateSemesterStatus = async (userId, semesterId, statusUpdateData) => {
+    if(statusUpdateData.status === 'active') {
+        const activeSemester = await Semester.findOne({
+            createdBy: userId,
+            status: 'active',
+            _id: {$ne:semesterId}
+        });
+
+        if (activeSemester) {
+            throw new CustomAPIError.ConflictError(
+                'You already have an active semester'
+            );
+        }
+    }
+
+    const semesterToUpdate = await findOwnerSemester(userId, semesterId);
+
+    Object.assign(semesterToUpdate, statusUpdateData);
+
+    await semesterToUpdate.save();
+
+    return {
+        message: 'Semester status updated successfully'
+    };
+
+}

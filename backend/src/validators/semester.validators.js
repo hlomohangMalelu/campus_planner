@@ -1,4 +1,5 @@
 import {BadRequestError} from "../errors/errors.js";
+import { validateMongooseId } from "./utils.js";
 import mongoose from "mongoose";
 
 export const validateSemesterDates = (startDate , endDate) => {
@@ -158,4 +159,21 @@ export const updateSemesterValidator = (req, res , next) => {
 
     next();
 
+}
+
+
+export const updateSemesterStatusValidator = (req, res, next) => {
+    const {status} = req.body; 
+
+    validateMongooseId(req.params.id , 'semester');
+
+    if(!status) {
+        throw new BadRequestError('Please provide a status to update');
+    }
+
+    req.validatedData = {
+        status : validateStatus(status)
+    };
+
+    next();
 }

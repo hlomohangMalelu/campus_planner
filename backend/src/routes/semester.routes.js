@@ -9,7 +9,7 @@ router.post('/', semesterValidator.createSemesterValidator,semesterController.cr
 router.get('/', semesterController.getAllSemesters);
 router.get('/:id', semesterValidator.mongooseIdValidator , semesterController.getSemester);
 router.patch('/:id' ,[semesterValidator.mongooseIdValidator,semesterValidator.updateSemesterValidator],semesterController.updateSemester);
-
+router.patch('/:id/activate',semesterValidator.updateSemesterStatusValidator , semesterController.updateSemesterStatus)
 
 
 export default router;
