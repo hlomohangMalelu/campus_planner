@@ -3,6 +3,7 @@ import express from "express";
 import connectDB from "./src/db/connect.js";
 import authRouter from "./src/routes/auth.js";
 import semesterRouter from "./src/routes/semester.routes.js";
+import courseRouter from "./src/routes/course.routes.js";
 import authorizeUser from "./src/middleware/auth.js";
 import notFoundMiddleware from "./src/middleware/not-found.js";
 import errorHanderMiddleware from "./src/middleware/error-handler.js";
@@ -20,6 +21,7 @@ app.get('/',(req,res) => {
 
 app.use('/api/v1/auth',authRouter);
 app.use('/api/v1/semesters',authorizeUser,semesterRouter);
+app.use('/api/v1/courses', authorizeUser, courseRouter);
 
 app.use(notFoundMiddleware); // Handle 404 for undefined routes
 app.use(errorHanderMiddleware); // Handle errors globally

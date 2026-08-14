@@ -54,4 +54,6 @@ export const validateMongooseId = (id , idOwner) => {
         throw new BadRequestError(`Invalid ${idOwner} ID`);
     }
 
+    return id;
+
 }
