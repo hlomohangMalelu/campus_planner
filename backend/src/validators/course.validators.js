@@ -91,3 +91,37 @@ export const getCourseValidator = (req, res, next) => {
     
     next();
 }
+
+
+export const updateCourseValidator = (req, res, next) => {
+    const {id} = req.params;
+    const {name, code, credits, description} = req.body;
+    const validatedData = {
+        courseId: validateMongooseId(id, 'Course')
+    };
+
+    const hasDescription = Object.hasOwn(req.body, 'description');
+    const hasCredits = Object.hasOwn(req.body, 'credits');
+
+    if(
+        !name?.trim() && 
+        !code?.trim() && 
+        !credits && 
+        !hasDescription
+    ) {
+        throw new BadRequestError('Please provide at least one field to update');
+    }
+
+    if(name) validatedData.name = validateName(name, 'Course');
+    
+    if(code) validatedData.code = validateCode(code);
+
+    if(hasCredits) validatedData.credits = validateCredits(credits);
+
+    if(hasDescription) validatedData.description = validateDescription(description);
+
+    req.validatedData = validatedData;
+
+    next();
+    
+}

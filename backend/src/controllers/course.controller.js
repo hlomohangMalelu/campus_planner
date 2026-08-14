@@ -43,3 +43,10 @@ export const getCourse = async (req, res) => {
         course : course.toPublicCourse()
     });
 }
+
+
+export const updateCourse = async (req, res) => {
+    return res.status(StatusCodes.OK).json({
+        ...req.validatedData
+    });
+}
