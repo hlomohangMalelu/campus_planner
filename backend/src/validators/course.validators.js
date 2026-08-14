@@ -80,3 +80,14 @@ export const getAllCoursesValidator = (req, res, next) => {
 
     next();
 }
+
+
+export const getCourseValidator = (req, res, next) => {
+    const {id} = req.params;
+
+    req.validatedData = {
+        courseId: validateMongooseId(id, 'Course')
+    }
+    
+    next();
+}

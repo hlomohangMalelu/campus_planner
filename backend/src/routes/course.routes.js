@@ -6,5 +6,6 @@ const router = express.Router();
 
 router.post('/',courseValidator.createCourseValidator, courseController.createCourse);
 router.get('/',courseValidator.getAllCoursesValidator, courseController.getAllCourses);
+router.get('/:id', courseValidator.getCourseValidator ,courseController.getCourse);
 
 export default router;

@@ -48,8 +48,18 @@ export const validatePassword = (password , confirmPassword) => {
     return password;
 }
 
+//validate mongoose id and throw error if invalid --middleware
+export const mongooseIdValidator = (req , res, next) => {
+    if(!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        throw new BadRequestError('Invalid  ID');
+    }
 
+    next();
+}
+
+//validate date and throw error if invalid
 export const validateMongooseId = (id , idOwner) => {
+    id = id?.trim();
     if(!mongoose.Types.ObjectId.isValid(id)) {
         throw new BadRequestError(`Invalid ${idOwner} ID`);
     }

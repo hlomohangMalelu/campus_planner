@@ -29,3 +29,17 @@ export const getAllCourses = async (req, res) => {
     });
 }
 
+
+export const getCourse = async (req, res) => {
+    const {
+        user: {userId}, 
+        validatedData: {courseId}
+    } = req;
+
+    const course = await courseService.getCourse(userId, courseId);
+
+    return res.status(StatusCodes.OK).json({
+        success: true,
+        course : course.toPublicCourse()
+    });
+}

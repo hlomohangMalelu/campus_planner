@@ -45,3 +45,23 @@ export const getAllCourses = async (userId, semesterId) => {
 
     return courses; 
 }    
+
+export const findOwnerCourse = async (userId, courseId) => {
+    const course = await Course.findOne({
+        _id: courseId,
+        createdBy: userId
+    });
+
+    if(!course) {
+        throw new CustomAPIError.NotFoundError('Course not found');
+    }
+
+    return course;
+
+}
+
+export const getCourse = async (userId, courseId) => {
+    
+    return await findOwnerCourse(userId, courseId);
+    
+}
