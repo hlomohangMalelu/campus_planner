@@ -26,3 +26,22 @@ export const createCourse = async (userId, courseData) => {
     return course;
 
 }
+
+
+export const getAllCourses = async (userId, semesterId) => {
+    const queryObject = {
+        createdBy: userId
+    };
+
+    if(semesterId) {
+        //check if user owns the semester and throw error if not
+        await findOwnerSemester(userId, semesterId); 
+        //add semesterId to query object
+        queryObject.semesterId = semesterId;
+    }
+
+    //find all courses for the user and semester if provided, sorted by code
+    const courses = await Course.find(queryObject).sort('code');
+
+    return courses; 
+}    

@@ -49,7 +49,7 @@ export const createCourseValidator = (req, res, next) => {
         throw new BadRequestError('Please provide all the required fields');
     }
 
-    validatedData.semesterId = validateMongooseId(semesterId , 'Semester');
+    validatedData.semesterId = validateMongooseId(semesterId.trim() , 'Semester');
     validatedData.name = validateName(name, 'Course name');
     validatedData.code = validateCode(code);
     validatedData.credits = validateCredits(credits);
@@ -59,6 +59,24 @@ export const createCourseValidator = (req, res, next) => {
     }
 
     req.validatedData = validatedData;
+
+    next();
+}
+
+
+export const getAllCoursesValidator = (req, res, next) => {
+    const {semesterId} = req.query;
+
+    if(semesterId?.trim()) {
+        req.validatedData = {
+            semesterId : validateMongooseId(semesterId, 'Semester')
+        }
+    }
+    else {
+        req.validatedData = {
+            semesterId: null
+        }
+    }
 
     next();
 }

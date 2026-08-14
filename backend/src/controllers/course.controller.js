@@ -14,3 +14,18 @@ export const createCourse = async (req, res) => {
 }
 
 
+export const getAllCourses = async (req, res) => {
+    const {
+        user: {userId}, 
+        validatedData: {semesterId}
+    } = req;
+
+    const courses = await courseService.getAllCourses(userId, semesterId);
+
+    return res.status(StatusCodes.OK).json({
+        success: true,
+        courses : courses.map((course) => course.toPublicCourse()),
+        nbHits: courses.length
+    });
+}
+
