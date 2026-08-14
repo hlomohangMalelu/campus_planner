@@ -63,5 +63,32 @@ export const findOwnerCourse = async (userId, courseId) => {
 export const getCourse = async (userId, courseId) => {
     
     return await findOwnerCourse(userId, courseId);
+
+}
+
+
+export const updateCourse = async (userId, courseData) => {
+    const {courseId, ...updateData} = courseData;
+    
+    const courseToUpdate = await findOwnerCourse(userId, courseId);
+
+    if(Object.hasOwn(updateData, 'code')) {
+        const existingCourse = await Course.findOne({
+            createdBy: userId,
+            semesterId: courseToUpdate.semesterId,
+            code,
+            _id: {$ne: courseId}
+        });
+
+        if(existingCourse) {
+            throw new CustomAPIError.ConflictError(`Course with code '${code}' already exists for this semester`);
+        }
+    }
+
+    Object.assign(courseToUpdate, updateData);
+
+    await courseToUpdate.save();
+
+    return courseToUpdate;
     
 }

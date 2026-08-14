@@ -46,7 +46,12 @@ export const getCourse = async (req, res) => {
 
 
 export const updateCourse = async (req, res) => {
+    const {userId} = req.user;
+    
+    const course = await courseService.updateCourse(userId, req.validatedData);
+   
     return res.status(StatusCodes.OK).json({
-        ...req.validatedData
+        success: true,
+        course : course.toPublicCourse()
     });
 }
