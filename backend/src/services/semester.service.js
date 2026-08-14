@@ -30,7 +30,7 @@ export const getAllSemesters = async (userId) => {
 }
 
 
-const findOwnerSemester = async (userId, semesterId) => {
+export const findOwnerSemester = async (userId, semesterId) => {
     const semester = await Semester.findOne({
         createdBy: userId, _id: semesterId
     });
