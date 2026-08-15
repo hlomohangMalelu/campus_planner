@@ -55,3 +55,20 @@ export const updateCourse = async (req, res) => {
         course : course.toPublicCourse()
     });
 }
+
+
+
+export const deleteCourse = async (req, res) => {
+
+    const {
+        user:{userId}, 
+        validatedData:{courseId}
+    } = req;
+
+    await courseService.deleteCourse(userId, courseId);
+
+    return res.status(StatusCodes.OK).json({
+        success: true,
+        message: 'Course deleted successfully'
+    });
+}

@@ -92,3 +92,17 @@ export const updateCourse = async (userId, courseData) => {
     return courseToUpdate;
     
 }
+
+
+export const deleteCourse = async (userId, courseId) => {
+
+    const course = await findOwnerCourse(userId, courseId);
+
+    //delete all data owned by course
+
+    await Course.deleteOne({
+        _id: course._id
+    });
+
+    return;
+}

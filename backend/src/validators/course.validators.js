@@ -82,7 +82,7 @@ export const getAllCoursesValidator = (req, res, next) => {
 }
 
 
-export const getCourseValidator = (req, res, next) => {
+export const courseIdValidator = (req, res, next) => {
     const {id} = req.params;
 
     req.validatedData = {
