@@ -1,27 +1,338 @@
 # Campus Planner
 
-Campus Planner is a full-stack academic planning application designed to help university students organize their semesters, courses, assignments, and other academic activities in one place.
+> A modern academic planning platform designed to help university students organize their academic life in one place.
 
-The project is being built as a practical showcase of backend development skills with Node.js and Express, while also providing a real user-facing application with a dedicated UI.
+Campus Planner is a full-stack application designed to bring a student's academic information together into one organized platform.
 
-> **Project status:** In active development.
-
-## Project Goals
-
-Campus Planner aims to provide students with a simple way to:
-
-- Manage their academic semesters
-- Organize courses under each semester
-- Track assignments and deadlines
-- Keep academic information organized by course
-- Eventually manage exams, timetables, study plans, and other academic resources
-- Access their information securely through authentication
-
-The project is also being developed as a learning project to demonstrate good backend architecture, validation, authentication, database design, and API development.
+Instead of keeping semesters, courses, assignments, exams, timetables, and study plans in separate places, Campus Planner connects them into a single academic workspace.
 
 ---
 
-## Tech Stack
+##  Overview
+
+The core academic structure is:
+
+```text
+Student
+   │
+   └── Semester
+        │
+        └── Course
+             │
+             ├── Assignments
+             ├── Exams
+             ├── Timetable
+             └── Other academic activities
+```
+
+A student can create a semester, add courses to it, and then attach academic activities to those courses.
+
+The long-term goal is to turn Campus Planner into a student's personal **academic command center**.
+
+---
+
+## The Problem
+
+University students often manage academic information using a mixture of:
+
+- Notes
+- Paper
+- Spreadsheets
+- Calendar applications
+- Messaging applications
+- Learning management systems
+- Personal reminders
+
+These tools may solve individual problems, but they do not necessarily provide one centralized view of a student's academic life.
+
+Campus Planner aims to provide that centralized experience.
+
+---
+
+## Vision
+
+A student should be able to open Campus Planner and quickly understand:
+
+```text
+What semester am I in?
+        ↓
+What courses am I taking?
+        ↓
+What assignments are due?
+        ↓
+What exams are coming?
+        ↓
+What does my timetable look like?
+        ↓
+What should I work on next?
+```
+
+---
+
+# Core Features
+
+## Authentication & Profiles
+
+Students can create and securely access their accounts.
+
+Current authentication functionality includes:
+
+- Registration
+- Login
+- Password hashing
+- JWT-based authentication
+- Protected resources
+- Profile management
+- Password changes
+
+---
+
+## Semester Management
+
+Students can create and manage their academic semesters.
+
+A semester contains information such as:
+
+- Semester name
+- Academic year
+- Start date
+- End date
+- Status
+
+Example:
+
+```text
+Semester 1
+2026/2027
+January → June
+Active
+```
+
+---
+
+## Course Management
+
+Courses belong to specific semesters.
+
+Students can manage:
+
+- Course name
+- Course code
+- Credits
+- Description
+
+Example:
+
+```text
+Semester 1
+│
+├── CS3400 — Data Structures
+├── CS3520 — Computer Organisation
+├── CS3541 — Computer Networks
+└── CS4433 — Software Engineering
+```
+
+---
+
+## Assignment Management
+
+Assignments belong to courses.
+
+Students can track:
+
+- Assignment title
+- Description
+- Due date
+- Priority
+- Completion status
+
+Assignments support:
+
+```text
+Status:
+- Pending
+- Completed
+- Overdue
+
+Priority:
+- Low
+- Medium
+- High
+```
+
+---
+
+# Planned Features
+
+### Exams
+
+- Exam dates
+- Exam venues
+- Exam status
+- Exam preparation tracking
+
+### Timetable
+
+- Weekly timetable
+- Lecture schedules
+- Practical/lab sessions
+- Venues
+- Clash detection
+
+### Academic Calendar
+
+A centralized calendar for:
+
+- Assignment deadlines
+- Exams
+- Important academic dates
+- Semester dates
+
+### Dashboard
+
+The dashboard will provide a quick academic overview:
+
+```text
+┌─────────────────────────────────────┐
+│          CAMPUS PLANNER             │
+├─────────────────────────────────────┤
+│ Current Semester                    │
+│ Semester 1 — 2026/2027             │
+│                                     │
+│ Courses        Assignments    Exams │
+│    6                12           4  │
+│                                     │
+│ Upcoming                            │
+│                                     │
+│ CS341  Assignment 2     Tomorrow    │
+│ CS352  Lab Report       Friday      │
+│ CS354  Test             Monday      │
+└─────────────────────────────────────┘
+```
+
+### Notifications & Reminders
+
+Potential reminders for:
+
+- Upcoming assignments
+- Approaching exams
+- Overdue work
+- Important academic dates
+
+### Study Planning
+
+Future study-planning features may include:
+
+- Study sessions
+- Study goals
+- Revision plans
+- Course-specific study schedules
+
+---
+
+# Application Architecture
+
+Campus Planner is being developed as a full-stack application:
+
+```text
+Campus Planner
+│
+├── Frontend
+│    └── User Interface
+│
+├── Backend
+│    └── REST API
+│
+└── Database
+     └── Application Data
+```
+
+At a high level:
+
+```text
+                    ┌──────────────────┐
+                    │      Student     │
+                    └────────┬─────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │    Frontend UI   │
+                    └────────┬─────────┘
+                             │
+                         HTTP / API
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │     Backend      │
+                    │    REST API      │
+                    └────────┬─────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │     Database     │
+                    └──────────────────┘
+```
+
+---
+
+# Academic Data Model
+
+The core relationship is:
+
+```text
+User
+ │
+ ├── Profile
+ │
+ └── Semesters
+       │
+       └── Courses
+             │
+             ├── Assignments
+             ├── Exams
+             ├── Timetable Entries
+             └── Other Resources
+```
+
+This hierarchical structure keeps academic information connected.
+
+For example:
+
+```text
+Assignment
+    ↓
+Course
+    ↓
+Semester
+    ↓
+Student
+```
+
+---
+
+# Ownership & Privacy
+
+Academic resources belong to the student who created them.
+
+The ownership hierarchy is:
+
+```text
+Student
+   ↓
+Semester
+   ↓
+Course
+   ↓
+Assignment
+```
+
+Students should only be able to access and modify resources belonging to their own account.
+
+This principle is enforced throughout the application.
+
+---
+
+# Technology
 
 ### Backend
 
@@ -34,693 +345,137 @@ The project is also being developed as a learning project to demonstrate good ba
 
 ### Frontend
 
-The frontend/UI is part of the project and will provide the user-facing Campus Planner application.
+A dedicated frontend/UI is being developed for the Campus Planner application.
 
-### Development Principles
+The frontend technology may evolve as development continues.
 
-The project follows a layered backend architecture:
+### Database Direction
+
+MongoDB is currently being used during development.
+
+The backend architecture is being designed with future database flexibility in mind, with PostgreSQL being a possible future production direction.
+
+---
+
+# Development Approach
+
+Campus Planner is being developed incrementally through development sprints.
+
+Each feature follows a progression similar to:
 
 ```text
-Routes
+Feature
    ↓
-Validators
+Data Model
    ↓
-Controllers
+Validation
    ↓
-Services
+Business Logic
    ↓
-Models
+API
    ↓
-Database
-```
-
-This separation is intended to make the application easier to maintain and make future database migration easier.
-
----
-
-## Core Architecture
-
-### Validators
-
-Validators are responsible for validating and normalizing user input before it reaches the controller.
-
-Examples include:
-
-- Required-field validation
-- Name validation
-- Email validation
-- Password validation
-- MongoDB ObjectId validation
-- Course-code validation
-- Credit validation
-- Date validation
-
-Validated data is passed through:
-
-```javascript
-req.validatedData
-```
-
-### Controllers
-
-Controllers handle HTTP concerns.
-
-They:
-
-1. Read authenticated/validated data
-2. Call the appropriate service
-3. Return the HTTP response
-
-Controllers do not contain the application's main business logic.
-
-### Services
-
-Services contain business logic and database operations.
-
-For example, creating a Course requires more than validating its fields. The service must verify that:
-
-- The requested Semester exists
-- The Semester belongs to the authenticated user
-- The Course does not already exist in that Semester
-
-This logic belongs in the service layer.
-
-### Models
-
-Mongoose models define the database structure and provide database-level validation and constraints.
-
-Mongoose validation acts as an additional safety layer after application-level validation.
-
----
-
-# Authentication
-
-Campus Planner uses JWT-based authentication.
-
-The authentication flow is:
-
-```text
-Register
+UI
    ↓
-Validate input
-   ↓
-Hash password
-   ↓
-Create user
-   ↓
-Login
-   ↓
-Verify password
-   ↓
-Create JWT
-   ↓
-Authenticated requests
+Testing
 ```
 
-Passwords are hashed using bcrypt before being stored.
----
-
-# Data Model
-
-The current academic hierarchy is:
-
-```text
-User
- └── Semester
-      └── Course
-           └── Assignment
-```
-
-## User
-
-A User represents a Campus Planner account.
-
-Current account information includes:
-
-- First name
-- Last name
-- Email
-- Password
-
-Username/profile functionality can be expanded separately.
+The goal is not only to make the application work, but to build it using maintainable and scalable software-development practices.
 
 ---
 
-## Semester
-
-A Semester belongs to a User.
-
-A Semester contains:
-
-- Name
-- Academic year
-- Start date
-- End date
-- Status
-- Creator
-
-Supported semester statuses:
-
-```text
-upcoming
-active
-completed
-```
-
-Example:
-
-```text
-Semester 1
-Academic Year: 2026/2027
-Start: January 2026
-End: June 2026
-Status: active
-```
-
-A user's semester is identified through ownership:
-
-```text
-createdBy → User
-```
-
----
-
-## Course
-
-A Course belongs to a Semester and a User.
-
-A Course contains:
-
-- Name
-- Code
-- Credits
-- Description
-- Semester ID
-- Creator
-
-Course codes are normalized to uppercase.
-
-For example:
-
-```text
-cs3411
-CS3411
-Cs3411
-```
-
-are normalized to:
-
-```text
-CS3411
-```
-
-Courses are unique within a user's semester:
-
-```text
-createdBy + semesterId + code
-```
-
----
-
-## Assignment
-
-An Assignment belongs to a Course and a User.
-
-Current fields include:
-
-- Title
-- Description
-- Due date
-- Status
-- Priority
-- Course ID
-- Creator
-
-Assignment statuses:
-
-```text
-pending
-completed
-overdue
-```
-
-Assignment priorities:
-
-```text
-low
-medium
-high
-```
-
----
-
-# Ownership and Authorization
-
-Campus Planner uses ownership checks throughout the service layer.
-
-For example, retrieving a Course does not simply search by:
-
-```javascript
-_id: courseId
-```
-
-It searches by:
-
-```javascript
-{
-    _id: courseId,
-    createdBy: userId
-}
-```
-
-This ensures users can only access their own resources.
-
-The same ownership principle applies to nested resources.
-
-```text
-User
- ↓ owns
-Semester
- ↓ owns
-Course
- ↓ owns
-Assignment
-```
-
-A child resource must belong to a parent resource owned by the authenticated user.
-
----
-
-# Cascade Deletion
-
-Campus Planner follows a parent-child deletion model.
-
-When a parent resource is deleted, resources owned by it should also be removed.
-
-For example:
-
-```text
-Delete Semester
-    ↓
-Delete Courses
-    ↓
-Delete Assignments
-    ↓
-Delete other course-owned resources
-```
-
-Similarly:
-
-```text
-Delete Course
-    ↓
-Delete Assignments
-    ↓
-Delete other Course-owned resources
-```
-
-A child resource must never delete its parent.
-
-For example:
-
-```text
-Deleting Course
-    ↓
-does NOT delete Semester
-```
-
-Cascade behavior will expand as additional academic resources are introduced.
-
----
-
-# API Design
-
-The API follows REST-style resource endpoints.
-
-Examples:
-
-```text
-POST   /api/v1/auth/register
-POST   /api/v1/auth/login
-
-GET    /api/v1/semesters
-GET    /api/v1/semesters/:id
-POST   /api/v1/semesters
-PATCH  /api/v1/semesters/:id
-DELETE /api/v1/semesters/:id
-
-GET    /api/v1/courses
-GET    /api/v1/courses/:id
-POST   /api/v1/courses
-PATCH  /api/v1/courses/:id
-DELETE /api/v1/courses/:id
-```
-
-Course filtering supports:
-
-```text
-GET /api/v1/courses?semesterId=<semesterId>
-```
-
-This returns courses belonging to the authenticated user's specified semester.
-
-Empty collections return a successful response rather than a Not Found error.
-
-Example:
-
-```json
-{
-    "success": true,
-    "courses": [],
-    "nbHits": 0
-}
-```
-
----
-
-# Error Handling
-
-The application uses custom API errors for different HTTP situations.
-
-Examples include:
-
-```text
-400 Bad Request
-401 Unauthorized
-404 Not Found
-409 Conflict
-```
-
-Examples:
-
-| Situation | Response |
-|---|---|
-| Invalid input | 400 |
-| Invalid authentication | 401 |
-| Resource not found | 404 |
-| Duplicate resource | 409 |
-
-For example, attempting to create a duplicate Course within the same Semester results in a conflict.
-
----
-
-# Validation Strategy
-
-Campus Planner uses two levels of validation.
-
-## Application-Level Validation
-
-Input is validated before reaching the controller.
-
-Example:
-
-```text
-Request
-   ↓
-Validator
-   ↓
-Validated data
-   ↓
-Controller
-```
-
-This provides clear and user-friendly error messages.
-
-## Mongoose Validation
-
-Mongoose remains a second line of defense.
-
-The database model defines constraints such as:
-
-- Required fields
-- Maximum lengths
-- Enums
-- References
-- Unique indexes
-
-This means invalid data should not reach the database even if application-level validation is accidentally bypassed.
-
----
-
-# Database Constraints
-
-Database-level uniqueness is used where appropriate.
-
-For Courses:
-
-```javascript
-CourseSchema.index(
-    {
-        createdBy: 1,
-        semesterId: 1,
-        code: 1
-    },
-    {
-        unique: true
-    }
-);
-```
-
-This provides a database-level guarantee that a user cannot have two Courses with the same code in the same Semester.
-
-Application-level checks are still performed so that users receive meaningful conflict responses.
-
----
-
-# Profile Management
-
-Authenticated users can manage their profile information.
-
-Current profile functionality includes:
-
-- Viewing profile
-- Updating first name
-- Updating last name
-- Updating email
-- Changing password
-
-Changing a password requires:
-
-```text
-Current password
-New password
-Confirm new password
-```
-
-The application also prevents changing the password to the same password currently in use.
-
----
-
-# Project Structure
-
-The backend follows a modular structure similar to:
-
-```text
-src/
-├── controllers/
-├── errors/
-├── middleware/
-├── models/
-├── routes/
-├── services/
-├── validators/
-├── utils/
-└── app.js
-```
-
-The exact structure may evolve as the project grows.
-
-The important architectural separation is:
-
-```text
-controllers/
-    HTTP logic
-
-services/
-    business logic + database operations
-
-validators/
-    request validation
-
-models/
-    database schemas
-
-middleware/
-    cross-cutting request processing
-
-utils/
-    reusable helpers
-```
-
----
-
-# Current Development Progress
-
-## Sprint 1 — Authentication & Profiles
-
-- [x] User model
-- [x] Registration validation
-- [x] Password hashing
-- [x] Login
-- [x] JWT authentication
-- [x] Authorization middleware
-- [x] Public user profile
-- [x] Update profile
-- [x] Change password
-- [ ] Forgot password flow
-- [ ] Username/profile expansion
-
-## Sprint 2 — Semesters
-
-- [x] Semester model
-- [x] Semester validation
-- [x] Create semester
-- [x] List semesters
-- [x] Get semester
-- [x] Update semester
-- [x] Delete semester
-- [x] Semester ownership
-- [x] Semester duplicate protection
-- [x] Active semester rules
-- [ ] Complete cascade implementation
-
-## Sprint 3 — Courses
-
-- [x] Course model
-- [x] Course validation
-- [x] Create course
-- [x] List courses
-- [x] Filter courses by semester
-- [x] Get course
-- [x] Update course
-- [x] Delete course
-- [x] Course ownership
-- [x] Duplicate course protection
-- [x] Course-to-semester relationship
-
-## Sprint 4 — Assignments
-
-- [x] Assignment model
-- [ ] Assignment validation
-- [ ] Create assignment
-- [ ] List assignments
-- [ ] Filter assignments
-- [ ] Get assignment
-- [ ] Update assignment
-- [ ] Delete assignment
-- [ ] Assignment cascade deletion
-- [ ] Due-date handling
-
----
 
 # Roadmap
 
-Future versions of Campus Planner are expected to expand beyond the current Semester → Course → Assignment hierarchy.
+```text
+Authentication
+      ↓
+Semesters
+      ↓
+Courses
+      ↓
+Assignments
+      ↓
+Exams
+      ↓
+Timetable
+      ↓
+Calendar
+      ↓
+Dashboard
+      ↓
+Study Planning
+      ↓
+Notifications
+```
 
-Potential features include:
-
-- Exams
-- Timetable management
-- Study schedules
-- Course materials
-- Academic goals
-- Assignment reminders
-- Exam reminders
-- Dashboard statistics
-- Calendar integration
-- Notifications
-- Search and filtering
-- Frontend dashboard
-- Responsive mobile UI
-- PostgreSQL migration
-
-The backend architecture is intentionally being kept database-agnostic where practical so that moving from MongoDB/Mongoose to PostgreSQL later requires changes primarily within the data-access/model layer rather than throughout the application.
+The roadmap may evolve as the application develops.
 
 ---
 
-# Running the Project
+# UI Direction
 
-## Requirements
+The UI is intended to focus on the student's most important information rather than presenting a collection of disconnected CRUD pages.
 
-Install:
-
-- Node.js
-- npm
-- MongoDB
-
-## Installation
-
-Clone the repository and install dependencies:
-
-```bash
-npm install
-```
-
-Create an environment file:
+The planned dashboard experience is:
 
 ```text
-.env
+Dashboard
+│
+├── Current Semester
+├── Courses
+├── Upcoming Assignments
+├── Upcoming Exams
+├── Today's Schedule
+└── Academic Overview
 ```
 
-Example configuration:
-
-```env
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_secret
-JWT_LIFETIME=1d
-PORT=5000
-```
-
-Start the development server:
-
-```bash
-npm run dev
-```
+The goal is to make common academic tasks quick and easy to access.
 
 ---
 
-# Development Philosophy
+> **Project Status:** Campus Planner is currently under active development.
 
-Campus Planner is being built incrementally rather than attempting to implement the entire application at once.
 
-Each sprint introduces a complete feature area:
 
-```text
-Model
-  ↓
-Validation
-  ↓
-Service
-  ↓
-Controller
-  ↓
-Routes
-  ↓
-API
-  ↓
-UI
-```
+The authentication, profile, semester, and course foundations have been implemented. Assignment management is currently being developed.
 
-The goal is not only to make the application work, but to practice building software that is:
+Campus Planner is being built as both:
 
-- Maintainable
-- Testable
-- Secure
-- Modular
-- Scalable
-- Easy to migrate to another database
-- Easy to extend with new academic features
+1. A practical academic planning platform
+2. A portfolio project demonstrating full-stack software development
 
 ---
 
-# Status
+# Project Goals
 
-**Campus Planner is currently under active development.**
+The project is intended to demonstrate practical experience with:
 
-The authentication, profile, semester, and course foundations have been implemented. Assignment management is the current development area.
+- Full-stack application development
+- REST API design
+- Authentication and authorization
+- Database modeling
+- Data validation
+- Service-layer architecture
+- Resource ownership
+- Error handling
+- CRUD operations
+- Hierarchical data modeling
+- Frontend development
+- Software architecture
+- Database migration planning
 
 ---
 
-## License
+# Contributing
+
+Campus Planner is currently being developed as an individual learning project.
+
+Contribution guidelines may be added as the project matures.
+
+---
+
+# License
 
 This project is currently intended as a learning project.
+
+A formal license will be added when the project reaches its appropriate release stage.
