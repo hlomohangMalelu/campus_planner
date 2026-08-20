@@ -1,233 +1,522 @@
 # Campus Planner
 
-Campus Planner is a backend-focused academic planning system designed to help students organize their university academic information in one place.
+Campus Planner is a full-stack academic planning application designed to help university students organize their semesters, courses, assignments, and other academic activities in one place.
 
-The project is being developed incrementally, with an emphasis on clean backend architecture, validation, ownership rules, maintainability, and reusable components.
+The project is being built as a practical showcase of backend development skills with Node.js and Express, while also providing a real user-facing application with a dedicated UI.
 
 > **Project status:** In active development.
 
+## Project Goals
+
+Campus Planner aims to provide students with a simple way to:
+
+- Manage their academic semesters
+- Organize courses under each semester
+- Track assignments and deadlines
+- Keep academic information organized by course
+- Eventually manage exams, timetables, study plans, and other academic resources
+- Access their information securely through authentication
+
+The project is also being developed as a learning project to demonstrate good backend architecture, validation, authentication, database design, and API development.
+
 ---
 
-## Overview
+## Tech Stack
 
-Campus Planner is intended to manage academic information such as:
+### Backend
 
-- User accounts and authentication
-- Academic semesters
-- Courses
-- Assignments
-- Exams
-- Timetables
-- Other academic planning data as the project grows
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
+- JSON Web Tokens (JWT)
+- bcrypt
 
-The backend is being designed around clear separation of responsibilities:
+### Frontend
+
+The frontend/UI is part of the project and will provide the user-facing Campus Planner application.
+
+### Development Principles
+
+The project follows a layered backend architecture:
 
 ```text
-Request
-   │
-   ▼
-Controller
-   │
-   ▼
-Validator
-   │
-   ▼
-Service
-   │
-   ▼
-Model / Database
+Routes
+   ↓
+Validators
+   ↓
+Controllers
+   ↓
+Services
+   ↓
+Models
+   ↓
+Database
 ```
 
-This separation keeps input validation, business rules, and database operations from becoming tightly coupled.
+This separation is intended to make the application easier to maintain and make future database migration easier.
 
 ---
 
-## Core Design Principles
+## Core Architecture
 
-### 1. Validate before business logic
+### Validators
 
-Validators are responsible for checking whether incoming data has the correct shape and format.
+Validators are responsible for validating and normalizing user input before it reaches the controller.
 
-For example, the Course validator is responsible for validating:
+Examples include:
 
-- Course name
-- Course code
-- Credits
-- Description
-- Semester ObjectId
+- Required-field validation
+- Name validation
+- Email validation
+- Password validation
+- MongoDB ObjectId validation
+- Course-code validation
+- Credit validation
+- Date validation
 
-The validator should not determine whether a referenced semester actually exists or belongs to the authenticated user. Those are service-layer responsibilities. This boundary is part of the current Course architecture. fileciteturn1file1
+Validated data is passed through:
+
+```javascript
+req.validatedData
+```
+
+### Controllers
+
+Controllers handle HTTP concerns.
+
+They:
+
+1. Read authenticated/validated data
+2. Call the appropriate service
+3. Return the HTTP response
+
+Controllers do not contain the application's main business logic.
+
+### Services
+
+Services contain business logic and database operations.
+
+For example, creating a Course requires more than validating its fields. The service must verify that:
+
+- The requested Semester exists
+- The Semester belongs to the authenticated user
+- The Course does not already exist in that Semester
+
+This logic belongs in the service layer.
+
+### Models
+
+Mongoose models define the database structure and provide database-level validation and constraints.
+
+Mongoose validation acts as an additional safety layer after application-level validation.
 
 ---
 
-### 2. Services contain business rules
+# Authentication
 
-After validation, the service layer performs operations that require knowledge of the database or application rules.
+Campus Planner uses JWT-based authentication.
 
-For Course creation, the planned flow is:
+The authentication flow is:
 
 ```text
-createCourse(userId, courseData)
-        │
-        ├── Find semester using:
-        │      semesterId + userId
-        │
-        ├── If semester does not exist
-        │      └── return 404
-        │
-        ├── Check for duplicate course:
-        │      userId + semesterId + code
-        │
-        ├── If duplicate
-        │      └── return an error
-        │
-        └── Create Course
+Register
+   ↓
+Validate input
+   ↓
+Hash password
+   ↓
+Create user
+   ↓
+Login
+   ↓
+Verify password
+   ↓
+Create JWT
+   ↓
+Authenticated requests
 ```
 
-This establishes the parent-child ownership rule: a user can only create a Course under a Semester that belongs to that user. fileciteturn1file0
-
+Passwords are hashed using bcrypt before being stored.
 ---
 
-### 3. Shared validation utilities
+# Data Model
 
-Generic validation logic should be reusable.
-
-For example:
+The current academic hierarchy is:
 
 ```text
-validators/
-├── utils.js
-├── auth.validator.js
-├── semester.validator.js
-└── course.validator.js
+User
+ └── Semester
+      └── Course
+           └── Assignment
 ```
 
-`validateMongooseId()` belongs in shared utilities because it can be reused by resources such as Courses, Assignments, Exams, and Timetables.
+## User
 
-Course-specific validation such as `validateCode()` and `validateCredits()` remains in the Course validator unless it becomes useful elsewhere. fileciteturn1file0
+A User represents a Campus Planner account.
+
+Current account information includes:
+
+- First name
+- Last name
+- Email
+- Password
+
+Username/profile functionality can be expanded separately.
 
 ---
 
-## Validation
+## Semester
 
-### Course code
+A Semester belongs to a User.
 
-Course codes are:
+A Semester contains:
 
-1. Trimmed
-2. Converted to uppercase
-3. Required to be between 3 and 20 characters
+- Name
+- Academic year
+- Start date
+- End date
+- Status
+- Creator
+
+Supported semester statuses:
+
+```text
+upcoming
+active
+completed
+```
 
 Example:
 
 ```text
-" cs3410 " → "CS3410"
+Semester 1
+Academic Year: 2026/2027
+Start: January 2026
+End: June 2026
+Status: active
 ```
 
-The length check uses an OR condition:
+A user's semester is identified through ownership:
+
+```text
+createdBy → User
+```
+
+---
+
+## Course
+
+A Course belongs to a Semester and a User.
+
+A Course contains:
+
+- Name
+- Code
+- Credits
+- Description
+- Semester ID
+- Creator
+
+Course codes are normalized to uppercase.
+
+For example:
+
+```text
+cs3411
+CS3411
+Cs3411
+```
+
+are normalized to:
+
+```text
+CS3411
+```
+
+Courses are unique within a user's semester:
+
+```text
+createdBy + semesterId + code
+```
+
+---
+
+## Assignment
+
+An Assignment belongs to a Course and a User.
+
+Current fields include:
+
+- Title
+- Description
+- Due date
+- Status
+- Priority
+- Course ID
+- Creator
+
+Assignment statuses:
+
+```text
+pending
+completed
+overdue
+```
+
+Assignment priorities:
+
+```text
+low
+medium
+high
+```
+
+---
+
+# Ownership and Authorization
+
+Campus Planner uses ownership checks throughout the service layer.
+
+For example, retrieving a Course does not simply search by:
 
 ```javascript
-if (code?.length < 3 || code?.length > 20) {
-    throw new BadRequestError(
-        'Course code must be between 3 to 20 characters'
-    );
+_id: courseId
+```
+
+It searches by:
+
+```javascript
+{
+    _id: courseId,
+    createdBy: userId
+}
+```
+
+This ensures users can only access their own resources.
+
+The same ownership principle applies to nested resources.
+
+```text
+User
+ ↓ owns
+Semester
+ ↓ owns
+Course
+ ↓ owns
+Assignment
+```
+
+A child resource must belong to a parent resource owned by the authenticated user.
+
+---
+
+# Cascade Deletion
+
+Campus Planner follows a parent-child deletion model.
+
+When a parent resource is deleted, resources owned by it should also be removed.
+
+For example:
+
+```text
+Delete Semester
+    ↓
+Delete Courses
+    ↓
+Delete Assignments
+    ↓
+Delete other course-owned resources
+```
+
+Similarly:
+
+```text
+Delete Course
+    ↓
+Delete Assignments
+    ↓
+Delete other Course-owned resources
+```
+
+A child resource must never delete its parent.
+
+For example:
+
+```text
+Deleting Course
+    ↓
+does NOT delete Semester
+```
+
+Cascade behavior will expand as additional academic resources are introduced.
+
+---
+
+# API Design
+
+The API follows REST-style resource endpoints.
+
+Examples:
+
+```text
+POST   /api/v1/auth/register
+POST   /api/v1/auth/login
+
+GET    /api/v1/semesters
+GET    /api/v1/semesters/:id
+POST   /api/v1/semesters
+PATCH  /api/v1/semesters/:id
+DELETE /api/v1/semesters/:id
+
+GET    /api/v1/courses
+GET    /api/v1/courses/:id
+POST   /api/v1/courses
+PATCH  /api/v1/courses/:id
+DELETE /api/v1/courses/:id
+```
+
+Course filtering supports:
+
+```text
+GET /api/v1/courses?semesterId=<semesterId>
+```
+
+This returns courses belonging to the authenticated user's specified semester.
+
+Empty collections return a successful response rather than a Not Found error.
+
+Example:
+
+```json
+{
+    "success": true,
+    "courses": [],
+    "nbHits": 0
 }
 ```
 
 ---
 
-### Course credits
+# Error Handling
 
-Credits are converted using `Number()` rather than `parseFloat()` so that invalid values such as:
+The application uses custom API errors for different HTTP situations.
 
-```text
-"3abc"
-```
-
-are not silently converted into:
+Examples include:
 
 ```text
-3
+400 Bad Request
+401 Unauthorized
+404 Not Found
+409 Conflict
 ```
 
-The intended validation is:
+Examples:
 
-```javascript
-const parsedCredits = Number(credits);
-
-if (!Number.isFinite(parsedCredits)) {
-    throw new BadRequestError(
-        'Please provide a valid value for credits'
-    );
-}
-
-if (parsedCredits < 1) {
-    throw new BadRequestError(
-        'Credits must be greater than or equal to 1'
-    );
-}
-
-return parsedCredits;
-```
-
-This accepts numeric strings such as `"3"` and `"3.5"` while rejecting invalid numeric input. fileciteturn1file0
-
----
-
-### Description
-
-Descriptions are optional.
-
-For creation, an omitted or empty description can simply mean that no description was supplied.
-
-For updates, however, the API distinguishes between:
-
-| Request | Meaning |
+| Situation | Response |
 |---|---|
-| `{}` | Keep the existing description |
-| `{"description": "New description"}` | Replace the description |
-| `{"description": ""}` | Remove the description |
+| Invalid input | 400 |
+| Invalid authentication | 401 |
+| Resource not found | 404 |
+| Duplicate resource | 409 |
 
-Therefore, PATCH validation should check whether the property was actually supplied:
-
-```javascript
-if (Object.hasOwn(req.body, 'description')) {
-    validatedData.description = validateDescription(description);
-}
-```
-
-This prevents an empty string from being accidentally treated the same as an omitted field. fileciteturn1file5
+For example, attempting to create a duplicate Course within the same Semester results in a conflict.
 
 ---
 
-## Error Handling
+# Validation Strategy
 
-The project uses application-specific errors such as:
+Campus Planner uses two levels of validation.
 
-```javascript
-BadRequestError
+## Application-Level Validation
+
+Input is validated before reaching the controller.
+
+Example:
+
+```text
+Request
+   ↓
+Validator
+   ↓
+Validated data
+   ↓
+Controller
 ```
 
-Validation errors should be raised deliberately rather than relying on database casting errors.
+This provides clear and user-friendly error messages.
 
-For example, an invalid `semesterId` should be checked by:
+## Mongoose Validation
 
-```javascript
-validateMongooseId(semesterId, 'Semester');
-```
+Mongoose remains a second line of defense.
 
-before the value reaches Mongoose.
+The database model defines constraints such as:
 
-This keeps malformed request errors separate from database/business-rule errors.
+- Required fields
+- Maximum lengths
+- Enums
+- References
+- Unique indexes
+
+This means invalid data should not reach the database even if application-level validation is accidentally bypassed.
 
 ---
 
-## Project Structure
+# Database Constraints
+
+Database-level uniqueness is used where appropriate.
+
+For Courses:
+
+```javascript
+CourseSchema.index(
+    {
+        createdBy: 1,
+        semesterId: 1,
+        code: 1
+    },
+    {
+        unique: true
+    }
+);
+```
+
+This provides a database-level guarantee that a user cannot have two Courses with the same code in the same Semester.
+
+Application-level checks are still performed so that users receive meaningful conflict responses.
+
+---
+
+# Profile Management
+
+Authenticated users can manage their profile information.
+
+Current profile functionality includes:
+
+- Viewing profile
+- Updating first name
+- Updating last name
+- Updating email
+- Changing password
+
+Changing a password requires:
+
+```text
+Current password
+New password
+Confirm new password
+```
+
+The application also prevents changing the password to the same password currently in use.
+
+---
+
+# Project Structure
 
 The backend follows a modular structure similar to:
 
 ```text
-project/
+src/
 ├── controllers/
 ├── errors/
 ├── middleware/
@@ -235,216 +524,203 @@ project/
 ├── routes/
 ├── services/
 ├── validators/
-│   ├── utils.js
-│   ├── auth.validator.js
-│   ├── semester.validator.js
-│   └── course.validator.js
-├── app.js
-└── server.js
+├── utils/
+└── app.js
 ```
 
-The exact structure may evolve as new modules are introduced.
+The exact structure may evolve as the project grows.
 
----
-
-## Academic Data Relationships
-
-The academic portion of the application is being designed around parent-child relationships.
-
-A simplified relationship is:
+The important architectural separation is:
 
 ```text
-User
- │
- └── Semester
-       │
-       ├── Course
-       │    ├── Assignment
-       │    └── Exam
-       │
-       └── other academic resources
-```
+controllers/
+    HTTP logic
 
-The important rule is that ownership must be checked through the parent relationship.
+services/
+    business logic + database operations
 
-For example:
+validators/
+    request validation
 
-```text
-User
- │
- └── Semester
-       │
-       └── Course
-```
+models/
+    database schemas
 
-A valid Course request is not enough on its own. The service must also verify that the referenced Semester belongs to the authenticated User. fileciteturn1file0
+middleware/
+    cross-cutting request processing
 
----
-
-## PATCH Semantics
-
-Update endpoints should use partial-update semantics.
-
-A missing property means:
-
-```text
-Do not change it.
-```
-
-A supplied property means:
-
-```text
-Validate it and update it.
-```
-
-For optional fields such as `description`, an explicitly supplied empty value can be meaningful.
-
-Example:
-
-```json
-{}
-```
-
-means:
-
-```text
-Keep everything unchanged.
-```
-
-Whereas:
-
-```json
-{
-  "description": ""
-}
-```
-
-means:
-
-```text
-Clear the description.
-```
-
-This distinction should be preserved throughout the validator → service → model flow. fileciteturn1file5
-
----
-
-## Development Workflow
-
-New resources should generally follow this sequence:
-
-```text
-1. Design the model
-       ↓
-2. Define validation rules
-       ↓
-3. Create validator
-       ↓
-4. Create service
-       ↓
-5. Implement controller
-       ↓
-6. Add routes
-       ↓
-7. Test success cases
-       ↓
-8. Test validation failures
-       ↓
-9. Test ownership/business rules
-       ↓
-10. Test update/delete edge cases
-```
-
-The project prioritizes getting the architecture right before adding more features.
-
----
-
-## Current Development Focus
-
-The current academic-planning development is moving from the completed authentication foundation into academic resources.
-
-The Course module is establishing several patterns that will be reused throughout the project:
-
-- Reusable Mongoose ObjectId validation
-- Resource-specific validators
-- Service-level ownership checks
-- Parent-child relationships
-- Duplicate detection
-- Clear separation between validation and business logic
-- Correct PATCH semantics
-
-These patterns are expected to apply to later resources such as Assignments, Exams, and Timetables. fileciteturn1file0
-
----
-
-## Example Course Validation Flow
-
-A Course creation request can be thought of as:
-
-```text
-HTTP Request
-     │
-     ▼
-Authentication
-     │
-     ▼
-Course Validator
-     │
-     ├── name
-     ├── code
-     ├── credits
-     ├── description
-     └── semesterId
-     │
-     ▼
-Course Service
-     │
-     ├── semester exists?
-     ├── semester belongs to user?
-     ├── duplicate course?
-     └── create course
-     │
-     ▼
-Course Model
-     │
-     ▼
-Database
-```
-
-The key architectural distinction is:
-
-```text
-Validator = "Is this input valid?"
-
-Service = "Is this operation allowed?"
-
-Model/Database = "Can this data be persisted?"
+utils/
+    reusable helpers
 ```
 
 ---
 
-## Goals
+# Current Development Progress
 
-The long-term goal is to build Campus Planner into a maintainable academic management system rather than simply a collection of CRUD endpoints.
+## Sprint 1 — Authentication & Profiles
 
-Important goals include:
+- [x] User model
+- [x] Registration validation
+- [x] Password hashing
+- [x] Login
+- [x] JWT authentication
+- [x] Authorization middleware
+- [x] Public user profile
+- [x] Update profile
+- [x] Change password
+- [ ] Forgot password flow
+- [ ] Username/profile expansion
 
-- Clean architecture
-- Strong validation
-- Consistent error handling
-- Secure user ownership
-- Reusable utilities
-- Predictable REST API behavior
-- Maintainable database models
-- Clear separation of concerns
-- Incremental development and testing
+## Sprint 2 — Semesters
+
+- [x] Semester model
+- [x] Semester validation
+- [x] Create semester
+- [x] List semesters
+- [x] Get semester
+- [x] Update semester
+- [x] Delete semester
+- [x] Semester ownership
+- [x] Semester duplicate protection
+- [x] Active semester rules
+- [ ] Complete cascade implementation
+
+## Sprint 3 — Courses
+
+- [x] Course model
+- [x] Course validation
+- [x] Create course
+- [x] List courses
+- [x] Filter courses by semester
+- [x] Get course
+- [x] Update course
+- [x] Delete course
+- [x] Course ownership
+- [x] Duplicate course protection
+- [x] Course-to-semester relationship
+
+## Sprint 4 — Assignments
+
+- [x] Assignment model
+- [ ] Assignment validation
+- [ ] Create assignment
+- [ ] List assignments
+- [ ] Filter assignments
+- [ ] Get assignment
+- [ ] Update assignment
+- [ ] Delete assignment
+- [ ] Assignment cascade deletion
+- [ ] Due-date handling
 
 ---
 
-## Project Status
+# Roadmap
 
-Campus Planner is currently under active development.
+Future versions of Campus Planner are expected to expand beyond the current Semester → Course → Assignment hierarchy.
 
-The project is being built incrementally, with authentication already established and the academic domain being implemented resource by resource.
+Potential features include:
 
-The Course module is currently helping establish the architecture and rules that will be reused by subsequent academic modules.
+- Exams
+- Timetable management
+- Study schedules
+- Course materials
+- Academic goals
+- Assignment reminders
+- Exam reminders
+- Dashboard statistics
+- Calendar integration
+- Notifications
+- Search and filtering
+- Frontend dashboard
+- Responsive mobile UI
+- PostgreSQL migration
+
+The backend architecture is intentionally being kept database-agnostic where practical so that moving from MongoDB/Mongoose to PostgreSQL later requires changes primarily within the data-access/model layer rather than throughout the application.
+
+---
+
+# Running the Project
+
+## Requirements
+
+Install:
+
+- Node.js
+- npm
+- MongoDB
+
+## Installation
+
+Clone the repository and install dependencies:
+
+```bash
+npm install
+```
+
+Create an environment file:
+
+```text
+.env
+```
+
+Example configuration:
+
+```env
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_secret
+JWT_LIFETIME=1d
+PORT=5000
+```
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+---
+
+# Development Philosophy
+
+Campus Planner is being built incrementally rather than attempting to implement the entire application at once.
+
+Each sprint introduces a complete feature area:
+
+```text
+Model
+  ↓
+Validation
+  ↓
+Service
+  ↓
+Controller
+  ↓
+Routes
+  ↓
+API
+  ↓
+UI
+```
+
+The goal is not only to make the application work, but to practice building software that is:
+
+- Maintainable
+- Testable
+- Secure
+- Modular
+- Scalable
+- Easy to migrate to another database
+- Easy to extend with new academic features
+
+---
+
+# Status
+
+**Campus Planner is currently under active development.**
+
+The authentication, profile, semester, and course foundations have been implemented. Assignment management is the current development area.
+
+---
+
+## License
+
+This project is currently intended as a learning project.
