@@ -67,3 +67,25 @@ export const validateMongooseId = (id , idOwner) => {
     return id;
 
 }
+
+export const validateDescription = (description) => {
+    description = description?.trim();
+
+    if(description?.length > 500) {
+        throw new BadRequestError('Description must be atmost 300 characters ');
+    }
+
+    return description;
+}
+
+
+export const validateDate = (dateString) => {
+    const newDate = new Date(dateString?.trim());
+
+    if (isNaN(newDate.getTime()) ) {
+        throw new BadRequestError("Please provide a valid date");
+    }
+
+    return newDate;
+
+}

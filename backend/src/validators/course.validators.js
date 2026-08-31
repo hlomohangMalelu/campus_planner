@@ -1,5 +1,5 @@
 import {BadRequestError} from "../errors/errors.js";
-import { validateName, validateMongooseId } from "./utils.js";
+import { validateName, validateMongooseId , validateDescription} from "./utils.js";
 
 const validateCode = (code) => {
     code = code?.trim().toUpperCase();
@@ -26,16 +26,6 @@ const validateCredits = (credits) => {
     return parsedCredits;
 }
 
-
-const validateDescription = (description) => {
-    description = description?.trim();
-
-    if(description?.length > 300) {
-        throw new BadRequestError('Description must be atmost 300 characters ');
-    }
-
-    return description;
-}
 
 export const createCourseValidator = (req, res, next) => {
     const {

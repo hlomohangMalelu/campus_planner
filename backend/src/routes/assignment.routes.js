@@ -1,5 +1,15 @@
+import express from "express";
+import * as assignmentValidators from "../validators/assignment.validators.js";
+import * as assigmentController from "../controllers/assignment.controller.js";
 
 
+const router = express.Router();
+
+router.post('/', assignmentValidators.createAssignmentValidator,assigmentController.createAssignment);
+
+
+
+export default router;
 /*Postman Collection for Assignment Routes
 POST /assignments
 GET /assignments
@@ -12,3 +22,4 @@ PATCH /assignments/:id/status
 PATCH /assignments/:id/priority
 DELETE /assignments/:id
 */
+

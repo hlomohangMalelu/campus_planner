@@ -1,5 +1,5 @@
 import {BadRequestError} from "../errors/errors.js";
-import { validateMongooseId } from "./utils.js";
+import { validateMongooseId, validateDate } from "./utils.js";
 import mongoose from "mongoose";
 
 export const validateSemesterDates = (startDate , endDate) => {
@@ -25,16 +25,6 @@ export const validateSemesterDates = (startDate , endDate) => {
     }
 }
 
-const validateDate = (dateString) => {
-    const newDate = new Date(dateString?.trim());
-
-    if (isNaN(newDate.getTime()) ) {
-        throw new BadRequestError("Please provide a valid date");
-    }
-
-    return newDate;
-
-}
 
 
 const validateAcademicYear = (academicYear) => {
