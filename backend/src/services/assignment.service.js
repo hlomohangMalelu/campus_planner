@@ -10,7 +10,7 @@ const validateDueDate = (dueDate) => {
     }
 }
 
-//ERROr somewhere after adding validateDueDate in the controller instead of service
+
 
 export const createAssignment = async (userId, assignmentData) => {
     validateDueDate(assignmentData.dueDate);
@@ -27,4 +27,3 @@ export const createAssignment = async (userId, assignmentData) => {
     return assignment;
 }
 
-//ERROr somewhere after adding validateDueDate in the controller instead of controller

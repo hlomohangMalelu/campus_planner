@@ -14,6 +14,3 @@ export const createAssignment = async (req, res) => {
         assignment: assignment.toPublicAssignment()
     });
 }
-
-
-//ERROr somewhere after adding validateDueDate in the controller instead of controller
