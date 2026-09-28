@@ -1,4 +1,19 @@
+import * as assignmentService from "../services/assignment.service.js";
 
-export const createAssignment = (req, res) => {
-    res.json(req.validatedData);
+
+export const createAssignment = async (req, res) => {
+    const {userId} = req.user;
+
+    const assignment = await assignmentService.createAssignment(
+        userId, 
+        req.validatedData
+    );
+
+    return res.json({
+        success: true,
+        assignment: assignment.toPublicAssignment()
+    });
 }
+
+
+//ERROr somewhere after adding validateDueDate in the controller instead of controller
